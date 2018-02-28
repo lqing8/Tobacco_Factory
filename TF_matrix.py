@@ -82,35 +82,42 @@ def geocode(address, key):
     #key = '22d3816e107f199992666d6412fa0691'
     #key = '837a9bdb426d81b6862135983d1d715c'
     #key = '608d75903d29ad471362f8c58c550daf'
-    base = '/v3/geocode/geo'
-    path = '{}?address={}&key={}'.format(base, quote_plus(address), key)
-    #print(path)
-    connection = http.client.HTTPConnection('restapi.amap.com',80)
-    connection.request('GET', path)
-    rawreply = connection.getresponse().read()
-    #print(rawreply)
-    reply = json.loads(rawreply.decode('utf-8'))
-    print(address + '的经纬度：',reply['geocodes'][0]['location'])
-    return reply['geocodes'][0]['location']
+    try:
+        base = '/v3/geocode/geo'
+        path = '{}?address={}&key={}'.format(base, quote_plus(address), key)
+        #print(path)
+        connection = http.client.HTTPConnection('restapi.amap.com',80)
+        connection.request('GET', path)
+        rawreply = connection.getresponse().read()
+        #print(rawreply)
+        reply = json.loads(rawreply.decode('utf-8'))
+        print(address + '的经纬度：',reply['geocodes'][0]['location'])
+        return reply['geocodes'][0]['location']
+    except:
+        print('geocode error')
 
 def getDistance(startLonLat, endLonLat, endString, key):
     provincial_capital = ['北京', '天津', '重庆', '上海', '石家庄', '沈阳', '哈尔滨', '杭州', '福州', '济南', '广州', '武汉', '成都', '昆明', '兰州', '台北', '南宁', '银川', '太原',
      '长春', '南京', '合肥', '南昌', '郑州', '长沙', '海口', '贵阳', '西安', '西宁', '呼和浩特', '拉萨', '乌鲁木齐', '澳门', '香港']
+    x = None
     if(startLonLat==endLonLat):
         x = 30
         return x
     else:
-        duration = 0;  # 起始地与目的地之间的距离
-        # path = '{}?key={}&origins={}&destination={}'.format('http://restapi.amap.com/v3/distance',key,startLonLat,endLonLat)
-        path='http://restapi.amap.com/v3/distance?key={}&origins={}&destination={}'.format(key,startLonLat,endLonLat)
-        #path = 'http://restapi.amap.com/v3/direction/driving?key={}&origin={}&destination={}'.format(key, startLonLat,endLonLat)
-        connection = http.client.HTTPConnection('restapi.amap.com', 80)
-        connection.request('GET', path)
-        rawreply = connection.getresponse().read()
-        # print(rawreply)
-        reply = json.loads(rawreply.decode('utf-8'))
-        # print(reply['results'][0]['distance'])
-        x = int(reply['results'][0]['distance'])/1000
+        try:
+            duration = 0;  # 起始地与目的地之间的距离
+            # path = '{}?key={}&origins={}&destination={}'.format('http://restapi.amap.com/v3/distance',key,startLonLat,endLonLat)
+            path='http://restapi.amap.com/v3/distance?key={}&origins={}&destination={}'.format(key,startLonLat,endLonLat)
+            #path = 'http://restapi.amap.com/v3/direction/driving?key={}&origin={}&destination={}'.format(key, startLonLat,endLonLat)
+            connection = http.client.HTTPConnection('restapi.amap.com', 80)
+            connection.request('GET', path)
+            rawreply = connection.getresponse().read()
+            # print(rawreply)
+            reply = json.loads(rawreply.decode('utf-8'))
+            # print(reply['results'][0]['distance'])
+            x = int(reply['results'][0]['distance'])/1000
+        except:
+            print('getDistance error')
 
     if(endString in provincial_capital): duration = 30
     else: duration = 10
@@ -139,15 +146,17 @@ def setDistance(rowS, colD, D, xls, key):
 
 #下面是一些测试代码。
 if __name__ == "__main__":
-    key = 'cb649a25c1f81c1451adbeca73623251'
+    #key = 'cb649a25c1f81c1451adbeca73623251'     #this key good
+    key = '36280aad084f5aa954f04ffe8adc4a20' #my key
     #key = '0b00174f6f8ab4ca8d350ac0da105bb9'
     #key = '389880a06e3f893ea46036f030c94700'
     #key = 'ee0c2ec9cd719c1c0adaef80f89b5aa8'
     #key = '22d3816e107f199992666d6412fa0691'
     #key = '837a9bdb426d81b6862135983d1d715c'
     #key = '608d75903d29ad471362f8c58c550daf'
+    #key = '6119e85defa6a97be090a0af41f0613c7'
     # x = getDistance(geocode('合肥', key), geocode('绵阳', key), '绵阳', key)
-    x = geocode('重庆重庆', key)
+    #x = geocode('重庆重庆', key)
 
     continueNum = 1
     ########### get base Excel and 转化 ###########
@@ -159,7 +168,7 @@ if __name__ == "__main__":
     filename = os.getcwd() + '\\TF_test.xlsx'
     xls_1 = easyExcel(filename)
     try:
-        row = 3
+        row = 46
         CN = (row - 3)*344
         continueNum = CN + 1
         while(row<= rowCount):
