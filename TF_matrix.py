@@ -160,7 +160,7 @@ if __name__ == "__main__":
     xls_1 = easyExcel(filename)
     try:
         row = 3
-        CN = (row - 3)*344 - 1
+        CN = (row - 3)*344
         continueNum = CN + 1
         while(row<= rowCount):
             p = xls.getCell('base', row, 2)
